@@ -43,8 +43,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Book.cs" />
+    <Compile Include="BookCopy.cs" />
+    <Compile Include="City.cs" />
+    <Compile Include="District.cs" />
+    <Compile Include="Edition.cs" />
+    <Compile Include="Library.cs" />
+    <Compile Include="LibraryVisitor.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Visitor.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
