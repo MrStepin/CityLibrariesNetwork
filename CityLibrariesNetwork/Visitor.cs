@@ -10,9 +10,9 @@ namespace CityLibrariesNetwork
     {
         public Visitor()
         {
-            VisitorId = Guid.NewGuid();
+            Id = Guid.NewGuid();
         }
 
-        public Guid VisitorId { get; set; }
+        public Guid Id { get; set; }
     }
 }

@@ -10,10 +10,10 @@ namespace CityLibrariesNetwork
     {
         public Library()
         {
-            LibraryId = Guid.NewGuid();
+            Id = Guid.NewGuid();
         }
 
-        public Guid LibraryId { get; set; }
+        public Guid Id { get; set; }
         public string Name { get; set; }
         public Guid DistrictId { get; set; }
     }

@@ -10,12 +10,10 @@ namespace CityLibrariesNetwork
     {
         public BookCopy()
         {
-            BookCopyId = Guid.NewGuid();
+            Id = Guid.NewGuid();
         }
-
-        public string Binding { get; set; }
-        public Book BookLink { get; set; }
-        public Edition Edition { get; set; }
-        public Guid BookCopyId { get; set; }
+        public Guid BookId { get; set; }
+        public Guid NumberOfEdition { get; set; }
+        public Guid Id { get; set; }
     }
 }

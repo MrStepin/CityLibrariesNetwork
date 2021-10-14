@@ -10,10 +10,10 @@ namespace CityLibrariesNetwork
     {
         public City()
         {
-            CityId = Guid.NewGuid();
+            Id = Guid.NewGuid();
         }
 
-        public Guid CityId { get; set; }
+        public Guid Id { get; set; }
         public string Name { get; set; }
     }
 }
