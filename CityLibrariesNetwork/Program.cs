@@ -49,6 +49,7 @@ namespace CityLibrariesNetwork
             romanovLibrary.DistrictId = centerDistrict.Id;
 
             Visitor Visitor0 = new Visitor();
+            Visitor0.Name = "qq"; 
             Visitor Visitor1 = new Visitor();
             Visitor Visitor2 = new Visitor();
             Visitor Visitor3 = new Visitor();
@@ -270,43 +271,25 @@ namespace CityLibrariesNetwork
             }
             Console.WriteLine("\n");
 
-            var south = from l in libraries where l.DistrictId == southDistrict.Id select l.Name ;
-            Console.WriteLine($"{southDistrict.Name} ({south.Count()})");
-            foreach (var l in south)
+            IEnumerable<IGrouping<string, string>> query = from dist in districts from lib in libraries where dist.Id == lib.DistrictId group lib.Name by dist.Name;
+            foreach (IGrouping<string, string> d in query)
             {
-                Console.WriteLine(l);
-            }
-            Console.WriteLine("\n");
-            var west = from l in libraries where l.DistrictId == westDistrict.Id select l.Name;
-            Console.WriteLine($"{westDistrict.Name} ({west.Count()})");
-            foreach (var l in west)
-            {
-                Console.WriteLine(l);
-            }
-            Console.WriteLine("\n");
-            var east = from l in libraries where l.DistrictId == eastDistrict.Id select l.Name;
-            Console.WriteLine($"{eastDistrict.Name} ({east.Count()})");
-            foreach (var l in east)
-            {
-                Console.WriteLine(l);
-            }
-            Console.WriteLine("\n");
-            var north = from l in libraries where l.DistrictId == northDistrict.Id select l.Name;
-            Console.WriteLine($"{northDistrict.Name} ({north.Count()})");
-            foreach (var l in north)
-            {
-                Console.WriteLine(l);
-            }
-            Console.WriteLine("\n");
-            var center = from l in libraries where l.DistrictId == centerDistrict.Id select l.Name;
-            Console.WriteLine($"{centerDistrict.Name} ({center.Count()})");
-            foreach (var l in center)
-            {
-                Console.WriteLine(l);
+                Console.WriteLine($"{d.Key} ({d.Count()})");
+                foreach(string name in d)
+                {
+                    Console.WriteLine(name);
+                }
             }
             Console.WriteLine("\n");
 
+            var distWithLib = from dist in districts from lib in libraries where dist.Id == lib.DistrictId select dist;
+            foreach(var d in districts.Except(distWithLib))
+            {
+                Console.WriteLine(d.Name);
+            }
+            Console.WriteLine("\n");
 
+            var allVisitors = from v in visitors select v.Name;
 
             Console.ReadLine();
         }
