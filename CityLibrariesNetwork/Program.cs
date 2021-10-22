@@ -49,16 +49,25 @@ namespace CityLibrariesNetwork
             romanovLibrary.DistrictId = centerDistrict.Id;
 
             Visitor Visitor0 = new Visitor();
-            Visitor0.Name = "qq"; 
+            Visitor0.Name = "0"; 
             Visitor Visitor1 = new Visitor();
+            Visitor1.Name = "1";
             Visitor Visitor2 = new Visitor();
+            Visitor2.Name = "2";
             Visitor Visitor3 = new Visitor();
+            Visitor3.Name = "3";
             Visitor Visitor4 = new Visitor();
+            Visitor4.Name = "4";
             Visitor Visitor5 = new Visitor();
+            Visitor5.Name = "5";
             Visitor Visitor6 = new Visitor();
+            Visitor6.Name = "6";
             Visitor Visitor7 = new Visitor();
+            Visitor7.Name = "7";
             Visitor Visitor8 = new Visitor();
+            Visitor8.Name = "8";
             Visitor Visitor9 = new Visitor();
+            Visitor9.Name = "9";
 
             Book warAndPeace = new Book();
             warAndPeace.Author = "LevTolstoy";
@@ -271,8 +280,11 @@ namespace CityLibrariesNetwork
             }
             Console.WriteLine("\n");
 
-            IEnumerable<IGrouping<string, string>> query = from dist in districts from lib in libraries where dist.Id == lib.DistrictId group lib.Name by dist.Name;
-            foreach (IGrouping<string, string> d in query)
+            var query = from dist in districts
+                        join lib in libraries
+                        on dist.Id equals lib.DistrictId 
+                        group lib.Name by dist.Name;
+            foreach (var d in query)
             {
                 Console.WriteLine($"{d.Key} ({d.Count()})");
                 foreach(string name in d)
@@ -282,14 +294,72 @@ namespace CityLibrariesNetwork
             }
             Console.WriteLine("\n");
 
-            var distWithLib = from dist in districts from lib in libraries where dist.Id == lib.DistrictId select dist;
-            foreach(var d in districts.Except(distWithLib))
+            var distWithLib = from dist in districts
+                              join lib in libraries
+                              on dist.Id equals lib.DistrictId
+                              into libGroup where !libGroup.Any()
+                              select dist;
+            foreach(var d in distWithLib)
             {
                 Console.WriteLine(d.Name);
             }
             Console.WriteLine("\n");
 
             var allVisitors = from v in visitors select v.Name;
+            foreach (var v in visitors)
+            {
+                Console.WriteLine(v.Name);
+            }
+            Console.WriteLine("\n");
+
+            var allVisitorsByLib = from vis in libraryVisitors
+                                   join lib in libraries on vis.LibraryId equals lib.Id
+                                   join v in visitors on vis.VisitorId equals v.Id
+                                   group v.Name by lib.Name;
+            foreach (var d in allVisitorsByLib)
+            {
+                Console.WriteLine($"{d.Key}");
+                foreach (string name in d)
+                {
+                    Console.WriteLine(name);
+                }
+            }
+            Console.WriteLine("\n");
+
+            var allVisitorsByDist = from vis in libraryVisitors
+                                   join lib in libraries on vis.LibraryId equals lib.Id
+                                   join v in visitors on vis.VisitorId equals v.Id
+                                   join dist in districts on lib.DistrictId equals dist.Id
+                                   group v.Name by dist.Name;
+            foreach (var d in allVisitorsByDist)
+            {
+                Console.WriteLine($"{d.Key}");
+                foreach (string name in d)
+                {
+                    Console.WriteLine(name);
+                }
+            }
+            Console.WriteLine("\n");
+
+            var districtsByVisitors = from vis in libraryVisitors
+                                      join lib in libraries on vis.LibraryId equals lib.Id
+                                      join dist in districts on lib.DistrictId equals dist.Id
+                                      join v in visitors on vis.VisitorId equals v.Id
+                                      group v by dist.Name into g
+                                      orderby g.Count() descending
+                                      group g.Count() by g.Key;
+
+            foreach (var d in districtsByVisitors)
+            {
+                Console.WriteLine($"{d.Key}");
+                foreach(int n in d)
+                {
+                    Console.WriteLine($"({n})");
+                }
+            }
+            Console.WriteLine("\n");
+
+
 
             Console.ReadLine();
         }
