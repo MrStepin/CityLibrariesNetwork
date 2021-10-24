@@ -15,5 +15,6 @@ namespace CityLibrariesNetwork
         public Guid BookId { get; set; }
         public Guid NumberOfEdition { get; set; }
         public Guid Id { get; set; }
+        public Guid LibraryId { get; set; }
     }
 }

@@ -154,11 +154,13 @@ namespace CityLibrariesNetwork
             
             Copy1.BookId = sherlokHolms.Id;
             Copy1.NumberOfEdition = SecondSherlokHolms.NumberOfEdition;
+            Copy1.LibraryId = lomonosovLibrary.Id;
 
             BookCopy Copy2 = new BookCopy();
 
             Copy2.BookId = masterAndMargarita.Id;
             Copy2.NumberOfEdition = SecondMasterAndMargarita.NumberOfEdition;
+            Copy2.LibraryId = leninLibrary.Id;
 
             Edition Edition3 = new Edition();
             Edition3.QtyOfPages = 100;
@@ -169,6 +171,7 @@ namespace CityLibrariesNetwork
             
             Copy3.BookId = book5.Id;
             Copy3.NumberOfEdition = Edition3.NumberOfEdition;
+            Copy3.LibraryId = stalinLibrary.Id;
 
             Edition Edition4 = new Edition();
             Edition4.QtyOfPages = 100;
@@ -179,21 +182,25 @@ namespace CityLibrariesNetwork
             
             Copy4.BookId = book5.Id;
             Copy4.NumberOfEdition = Edition4.NumberOfEdition;
+            Copy4.LibraryId = leninLibrary.Id;
 
             BookCopy Copy5 = new BookCopy();
            
             Copy5.BookId = warAndPeace.Id;
             Copy5.NumberOfEdition = FirstWarAndPeace.NumberOfEdition;
+            Copy5.LibraryId = breznevLibrary.Id;
 
             BookCopy Copy6 = new BookCopy();
             
             Copy6.BookId = masterAndMargarita.Id;
             Copy6.NumberOfEdition = FirstMasterAndMargarita.NumberOfEdition;
+            Copy6.LibraryId = romanovLibrary.Id;
 
             BookCopy Copy7 = new BookCopy();
            
             Copy7.BookId = sherlokHolms.Id;
             Copy7.NumberOfEdition = FirstSherlokHolms.NumberOfEdition;
+            Copy7.LibraryId = lomonosovLibrary.Id;
 
             LibraryVisitor visitor0 = new LibraryVisitor();
             visitor0.VisitorId = Visitor0.Id;
@@ -219,7 +226,7 @@ namespace CityLibrariesNetwork
             LibraryVisitor visitor3 = new LibraryVisitor();
             visitor3.VisitorId = Visitor3.Id;
             visitor3.LibraryId = stalinLibrary.Id;
-            visitor3.BookCopyId = Copy3.Id;
+            visitor3.BookCopyId = Copy5.Id;
             visitor3.GetTime = 1;
             visitor3.ReturnTime = 2;
 
@@ -345,21 +352,89 @@ namespace CityLibrariesNetwork
                                       join lib in libraries on vis.LibraryId equals lib.Id
                                       join dist in districts on lib.DistrictId equals dist.Id
                                       join v in visitors on vis.VisitorId equals v.Id
-                                      group v by dist.Name into g
+                                      group v by dist into g
                                       orderby g.Count() descending
-                                      group g.Count() by g.Key;
-
+                                      select new
+                                      {
+                                          District = g.Key.Name,
+                                          VisitorsCount = g.Count()
+                                      };
             foreach (var d in districtsByVisitors)
             {
-                Console.WriteLine($"{d.Key}");
-                foreach(int n in d)
-                {
-                    Console.WriteLine($"({n})");
-                }
+                Console.WriteLine($"District: {d.District}, VisitorsCount: {d.VisitorsCount}");
             }
             Console.WriteLine("\n");
 
+            var qtyOfBookByGenre = from b in books
+                                   group b.Id by b.Genre into g
+                                   select new
+                                   { bookQty = g.Count(),
+                                     Name = g.Key
+                                   };
 
+            foreach (var booksQty in qtyOfBookByGenre)
+            {
+                Console.WriteLine($"{booksQty.Name} - {booksQty.bookQty}");
+            }
+            Console.WriteLine("\n");
+
+            var QtyOfBookByGenreInLib = from b in books
+                                        join bk in booksCopy on b.Id equals bk.BookId
+                                        join lib in libraries on bk.LibraryId equals lib.Id
+                                        group b.Genre by lib into g
+                                        select new
+                                        {
+                                            BookQtyInGenreInLib = g.Count(),
+                                            LibName = g.Key.Name
+                                        };
+            foreach (var booksQty in QtyOfBookByGenreInLib)
+            {
+                Console.WriteLine($"{booksQty.LibName} - {booksQty.BookQtyInGenreInLib}");
+            }
+            Console.WriteLine("\n");
+
+            var QtyOfCopies = from b in books
+                              join bk in booksCopy on b.Id equals bk.BookId
+                              group bk.Id by b.Genre into g
+                              select new
+                              {
+                                  bookQty = g.Count(),
+                                  Name = g.Key
+                              };
+            foreach (var booksQty in QtyOfCopies)
+            {
+                Console.WriteLine($"{booksQty.Name} - {booksQty.bookQty}");
+            }
+            Console.WriteLine("\n");
+
+            var mostPopularBook = from b in books
+                                  join bk in booksCopy on b.Id equals bk.BookId
+                                  join vl in libraryVisitors on bk.Id equals vl.BookCopyId
+                                  group vl.BookCopyId by b.Name into g
+                                  orderby g.Count() descending
+                                  select new
+                                  {
+                                      mostPopBook = g.Count(),
+                                      BookName = g.Key
+                                  };
+            Console.WriteLine($"{mostPopularBook.First().BookName} - {mostPopularBook.First().mostPopBook}");
+            Console.WriteLine("\n");
+
+            var mostPopularBookByLib = from b in books
+                                       join bk in booksCopy on b.Id equals bk.BookId
+                                       join vl in libraryVisitors on bk.Id equals vl.BookCopyId
+                                       join lib in libraries on vl.LibraryId equals lib.Id
+                                       group b.Name by lib.Name into g
+                                       select new
+                                       {
+                                           libName = g.Key,
+                                           BookName = g
+                                       };
+            foreach (var mpbBylib in mostPopularBookByLib)
+            {
+                Console.WriteLine($"{mpbBylib.libName} - {mpbBylib.BookName}");
+            }
+            Console.WriteLine("\n");
 
             Console.ReadLine();
         }
