@@ -226,7 +226,7 @@ namespace CityLibrariesNetwork
             LibraryVisitor visitor3 = new LibraryVisitor();
             visitor3.VisitorId = Visitor3.Id;
             visitor3.LibraryId = stalinLibrary.Id;
-            visitor3.BookCopyId = Copy5.Id;
+            visitor3.BookCopyId = Copy7.Id;
             visitor3.GetTime = 1;
             visitor3.ReturnTime = 2;
 
@@ -247,7 +247,7 @@ namespace CityLibrariesNetwork
             LibraryVisitor visitor6 = new LibraryVisitor();
             visitor6.VisitorId = Visitor6.Id;
             visitor6.LibraryId = lomonosovLibrary.Id;
-            visitor6.BookCopyId = Copy6.Id;
+            visitor6.BookCopyId = Copy1.Id;
             visitor6.GetTime = 1;
             visitor6.ReturnTime = 2;
 
@@ -268,7 +268,7 @@ namespace CityLibrariesNetwork
             LibraryVisitor visitor9 = new LibraryVisitor();
             visitor9.VisitorId = Visitor9.Id;
             visitor9.LibraryId = leninLibrary.Id;
-            visitor9.BookCopyId = Copy3.Id;
+            visitor9.BookCopyId = Copy2.Id;
             visitor9.GetTime = 1;
             visitor9.ReturnTime = 2;
 
@@ -378,7 +378,7 @@ namespace CityLibrariesNetwork
             }
             Console.WriteLine("\n");
 
-            var QtyOfBookByGenreInLib = from b in books
+            var qtyOfBookByGenreInLib = from b in books
                                         join bk in booksCopy on b.Id equals bk.BookId
                                         join lib in libraries on bk.LibraryId equals lib.Id
                                         group b.Genre by lib into g
@@ -387,13 +387,13 @@ namespace CityLibrariesNetwork
                                             BookQtyInGenreInLib = g.Count(),
                                             LibName = g.Key.Name
                                         };
-            foreach (var booksQty in QtyOfBookByGenreInLib)
+            foreach (var booksQty in qtyOfBookByGenreInLib)
             {
                 Console.WriteLine($"{booksQty.LibName} - {booksQty.BookQtyInGenreInLib}");
             }
             Console.WriteLine("\n");
 
-            var QtyOfCopies = from b in books
+            var qtyOfCopies = from b in books
                               join bk in booksCopy on b.Id equals bk.BookId
                               group bk.Id by b.Genre into g
                               select new
@@ -401,7 +401,7 @@ namespace CityLibrariesNetwork
                                   bookQty = g.Count(),
                                   Name = g.Key
                               };
-            foreach (var booksQty in QtyOfCopies)
+            foreach (var booksQty in qtyOfCopies)
             {
                 Console.WriteLine($"{booksQty.Name} - {booksQty.bookQty}");
             }
@@ -410,31 +410,88 @@ namespace CityLibrariesNetwork
             var mostPopularBook = from b in books
                                   join bk in booksCopy on b.Id equals bk.BookId
                                   join vl in libraryVisitors on bk.Id equals vl.BookCopyId
-                                  group vl.BookCopyId by b.Name into g
+                                  group vl.BookCopyId by b into g
                                   orderby g.Count() descending
                                   select new
                                   {
                                       mostPopBook = g.Count(),
-                                      BookName = g.Key
+                                      BookName = g.Key.Name
                                   };
             Console.WriteLine($"{mostPopularBook.First().BookName} - {mostPopularBook.First().mostPopBook}");
             Console.WriteLine("\n");
 
             var mostPopularBookByLib = from b in books
                                        join bk in booksCopy on b.Id equals bk.BookId
-                                       join vl in libraryVisitors on bk.Id equals vl.BookCopyId
-                                       join lib in libraries on vl.LibraryId equals lib.Id
-                                       group b.Name by lib.Name into g
+                                       join lib in libraries on bk.LibraryId equals lib.Id
+                                       group b by lib into g
                                        select new
                                        {
-                                           libName = g.Key,
-                                           BookName = g
+                                           libName = g.Key.Name,
+                                           BookName = from b in g
+                                                      join bk in booksCopy on b.Id equals bk.BookId
+                                                      join vl in libraryVisitors on bk.Id equals vl.BookCopyId
+                                                      group vl.BookCopyId by b into ng
+                                                      orderby ng.Count() descending
+                                                      select ng.Key.Name
                                        };
             foreach (var mpbBylib in mostPopularBookByLib)
             {
-                Console.WriteLine($"{mpbBylib.libName} - {mpbBylib.BookName}");
+                Console.WriteLine($"{mpbBylib.libName} - {mpbBylib.BookName.First()}");
             }
             Console.WriteLine("\n");
+
+            var mostPopularGenre = from b in books
+                                  join bk in booksCopy on b.Id equals bk.BookId
+                                  join vl in libraryVisitors on bk.Id equals vl.BookCopyId
+                                  group vl.BookCopyId by b.Genre into g
+                                  orderby g.Count() descending
+                                  select new
+                                  {
+                                      mostPopGenre = g.Count(),
+                                      GenreName = g.Key
+                                  };
+            Console.WriteLine($"{mostPopularGenre.First().GenreName} - {mostPopularGenre.First().mostPopGenre}");
+            Console.WriteLine("\n");
+
+            var mostPopularGenreByLib = from b in books
+                                       join bk in booksCopy on b.Id equals bk.BookId
+                                       join lib in libraries on bk.LibraryId equals lib.Id
+                                       group b by lib into g
+                                       select new
+                                       {
+                                           libName = g.Key.Name,
+                                           GenreName = from b in g
+                                                      join bk in booksCopy on b.Id equals bk.BookId
+                                                      join vl in libraryVisitors on bk.Id equals vl.BookCopyId
+                                                      group vl.BookCopyId by b.Genre into ng
+                                                      orderby ng.Count() descending
+                                                      select ng.Key
+                                       };
+            foreach (var mpbBylib in mostPopularGenreByLib)
+            {
+                Console.WriteLine($"{mpbBylib.libName} - {mpbBylib.GenreName.First()}");
+            }
+            Console.WriteLine("\n");
+
+            var topBooks = from b in books
+                              join bk in booksCopy on b.Id equals bk.BookId
+                              join vl in libraryVisitors on bk.Id equals vl.BookCopyId
+                              group vl.BookCopyId by b.Genre into g
+                              select new
+                              {
+                                  mostPopGenre = g.Key,
+                                  BookName = from v in g
+                                             join bk in booksCopy on v equals bk.Id
+                                             join b in books on bk.Id equals b.Id
+                                             group v by b into ng
+                                             select ng.Key.Name
+                              };
+            foreach (var mostPopGenre in topBooks)
+            {
+                Console.WriteLine($"{mostPopGenre.mostPopGenre} - {mostPopGenre.BookName}");
+            }
+            Console.WriteLine("\n");
+
 
             Console.ReadLine();
         }
