@@ -14,8 +14,8 @@ namespace CityLibrariesNetwork
 
         public Guid BookCopyId { get; set; }
 
-        public double GetTime { get; set; }
+        public string GetTime { get; set; }
 
-        public double ReturnTime { get; set; }
+        public string ReturnTime { get; set; }
     }
 }
